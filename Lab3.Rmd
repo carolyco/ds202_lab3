@@ -1,0 +1,96 @@
+---
+title: "DS202_lab3"
+author: "Caroly Coronado- Vargas"
+date: "10/2/2021"
+output: html_document
+---
+
+```{R}
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+
+dat <- readr::read_csv('/Users/caroly/desktop/DS 202/Labs/GSS.csv/GSS.csv')
+
+```
+
+```{r}
+dat<- select(dat,ballot,id,year,income,marital,educ,sex,partyid,happy)
+
+head(dat)
+```
+
+### 1 ###
+
+**Code for marital: 1= Married, 2= Widowed, 3= Divorced, 4= Separated, 5=Never married.**
+
+*Based on the data, people who have never been married are most likely to have a higher education. In comparison, those who are widowed have the least average education amongst the respondents. *
+
+```{r}
+dat %>% 
+  group_by(marital) %>%
+  summarize(education= mean(educ, na.rm = TRUE)) %>%
+  arrange(education)
+
+```
+### 2 ###
+
+```{r}
+new_data <- data.frame(dat %>% 
+  group_by(marital) %>%
+  filter(educ > mean(educ, na.rm = TRUE))) 
+
+head(new_data)
+str(new_data)  
+
+```
+### 3 ###
+
+**Using Happiness as defined by the mean of happy variable(level of happiness) and then grouped by marital status: We find that the people who are the happiest are those who are married and those who are the least happiest are people who are separated. Since we have a category of those who did not respond to their marital status we will discard them when doing our analysis since we do not know their status. People who have never been married report the second highest level of happiness which may suggest that their education levels have more to do in their happiness score than marital status.**
+
+```{r}
+dat %>% 
+  filter(`happy` %in% c('1', '2', '3')) %>%
+  mutate(HappyOrNot = (`happy` %in% c('1', '2'))) %>%
+ select(`happy`, HappyOrNot)
+
+
+dat %>% 
+  group_by(marital) %>%
+  summarize(happiness= mean(happy, na.rm = TRUE)) %>%
+  arrange(happiness)
+
+#From this point on, my graphs were not working and I got error codes while rerunning my code and trying to import the data set.
+```
+### 4 ###
+
+**Yes, party affiliation does affect the relationship we found in the last question. Based on our analysis, the group with the highest reported average happiness are those married who political beliefs are strong republican.**
+
+```{r}
+#Code to see what political affiliation tends to be the happiest.
+dat %>% 
+  group_by(partyid) %>%
+  summarize(happiness= mean(happy, na.rm = TRUE)) %>%
+  arrange(happiness)
+
+#Code for answer
+dat %>% 
+  group_by(marital,partyid) %>%
+  summarize(happiness= mean(happy, na.rm = TRUE)) %>%
+  arrange(happiness)
+
+```
+### 5 ###
+
+**The question I want to answer is if the education level, gender, and marital status have an impact on happiness. Based on our analysis(excluding NA results), married males with education level of 1 have the highest average happiness rating followed by married women with education level of 12, while looking through the level of education, gender and martial status, gender seems to have a less important influence on happiness level.**
+
+```{r}
+dat %>% 
+  group_by(marital,sex,educ) %>%
+  summarize(happiness= mean(happy, na.rm = TRUE)) %>%
+  arrange(happiness)
+
+
+```
+
+
